@@ -11,6 +11,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import ie.setu.placemark_jpc_v1.ui.theme.PlacemarkJPCV1Theme
+import timber.log.Timber
+import timber.log.Timber.Forest.i
+
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -26,6 +29,8 @@ class MainActivity : ComponentActivity() {
                 }
             }
         }
+        Timber.plant(Timber.DebugTree())
+        i("Placemark MainActivity started..")
     }
 }
 
