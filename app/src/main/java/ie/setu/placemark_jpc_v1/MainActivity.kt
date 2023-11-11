@@ -14,6 +14,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -37,6 +38,7 @@ import androidx.compose.ui.modifier.modifierLocalConsumer
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import ie.setu.placemark_jpc_v1.models.PlacemarkModel
 import ie.setu.placemark_jpc_v1.ui.theme.PlacemarkJPCV1Theme
 import timber.log.Timber
 import timber.log.Timber.Forest.i
@@ -62,6 +64,9 @@ class MainActivity : ComponentActivity() {
         }
         Timber.plant(Timber.DebugTree())
         i("Placemark MainActivity started..")
+        fun addPlacemark(title: String){
+            i("Title entered is: $title")
+        }
     }
 }
 
@@ -86,6 +91,7 @@ fun GreetingPreview() {
 @Composable
 fun ShowAddPlacemark() {
     var title by remember { mutableStateOf("") }
+    var showError by remember { mutableStateOf(false) }
 
     PlacemarkJPCV1Theme {
         Column(
@@ -103,19 +109,36 @@ fun ShowAddPlacemark() {
                     placeholderColor = MaterialTheme.colorScheme.onPrimary
                 ),
                 value = title,
-                onValueChange = { title = it },
+                onValueChange = {
+                    title = it
+                    showError = false
+                                },
+                isError = showError,
                 modifier = Modifier.fillMaxWidth(),
                 label = { Text(stringResource(id = R.string.text_titleHint)) },
                 trailingIcon = {
+                    if (showError)
+                        Icon(
+                            Icons.Filled.Warning, "error",
+                            tint = MaterialTheme.colorScheme.error
+                        )
+                    else
                     Icon(
-                        Icons.Default.Edit, contentDescription = "",
+                        Icons.Default.Edit, contentDescription = "add/edit",
                         tint = Color.Black
                     )
                 },
+                supportingText = { ShowSupportText(showError)}
             )
             Button(
-                onClick = { },
-                modifier = Modifier.align(Alignment.CenterHorizontally),
+                onClick = {
+                          if(title.isEmpty()){
+                              showError = true
+                          } else {
+                              addPlacemark(title)
+                          }
+                },
+                // modifier = Modifier.align(Alignment.CenterHorizontally),
                 elevation = ButtonDefaults.buttonElevation(20.dp)
             ) {
                 Icon(Icons.Default.Add, contentDescription = "Add")
@@ -146,4 +169,19 @@ fun ShowToolBar(){
             }
         )
     }
+}
+fun addPlacemark(title: String) {
+    val placemark = PlacemarkModel()
+    placemark.title = title
+    i("Title entered is: $placemark.title")
+}
+@Composable
+fun ShowSupportText(isError : Boolean){
+    if(isError)
+        Text(
+            text = "This Field is required",
+            style = MaterialTheme.typography.labelMedium,
+            color = MaterialTheme.colorScheme.error
+        )
+    else Text(text = "")
 }
